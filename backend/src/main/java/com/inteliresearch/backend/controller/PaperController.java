@@ -2,6 +2,7 @@ package com.inteliresearch.backend.controller;
 
 import com.inteliresearch.backend.entity.Paper;
 import com.inteliresearch.backend.repository.PaperRepository;
+import com.inteliresearch.backend.service.PaperSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,5 +23,12 @@ public class PaperController {
     @GetMapping
     public List<Paper> getAllPapers() {
         return paperRepository.findAll();
+    }
+    @Autowired
+    private PaperSearchService paperSearchService;
+
+    @GetMapping("/search")
+    public List<Paper> searchPapers(@RequestParam String topic) {
+        return paperSearchService.searchAndSavePapers(topic);
     }
 }
