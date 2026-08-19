@@ -24,6 +24,9 @@ public class PaperController {
     @Autowired
     private ArxivSearchService arxivSearchService;
 
+    @Autowired
+    private LimitationExtractionService limitationExtractionService;
+
     @PostMapping
     public Paper createPaper(@RequestBody Paper paper) {
         return paperRepository.save(paper);
@@ -43,13 +46,24 @@ public class PaperController {
     public List<Paper> searchArxivPapers(@RequestParam String topic) {
         return arxivSearchService.searchAndSavePapers(topic);
     }
-    @Autowired
-    private LimitationExtractionService limitationExtractionService;
 
     @PostMapping("/{id}/extract-limitations")
     public List<Limitation> extractLimitations(@PathVariable Long id) {
         Paper paper = paperRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Paper not found with id: " + id));
         return limitationExtractionService.extractLimitations(paper);
+    }
+
+    @PostMapping("/{id}/extract-limitations-llm")
+    public List<Limitation> extractLimitationsLLM(@PathVariable Long id) {
+        Paper paper = paperRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paper not found with id: " + id));
+        return limitationExtractionService.extractLimitationsWithLLM(paper);
+    }
+
+    @PostMapping("/extract-all-limitations")
+    public List<Limitation> extractAllLimitations() {
+        List<Paper> allPapers = paperRepository.findAll();
+        return limitationExtractionService.extractLimitationsForAllPapers(allPapers);
     }
 }
