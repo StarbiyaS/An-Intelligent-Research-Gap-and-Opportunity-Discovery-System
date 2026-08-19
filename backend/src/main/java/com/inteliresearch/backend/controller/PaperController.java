@@ -1,7 +1,9 @@
 package com.inteliresearch.backend.controller;
 
+import com.inteliresearch.backend.entity.Limitation;
 import com.inteliresearch.backend.entity.Paper;
 import com.inteliresearch.backend.repository.PaperRepository;
+import com.inteliresearch.backend.service.LimitationExtractionService;
 import com.inteliresearch.backend.service.PaperSearchService;
 import com.inteliresearch.backend.service.ArxivSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +42,14 @@ public class PaperController {
     @GetMapping("/search/arxiv")
     public List<Paper> searchArxivPapers(@RequestParam String topic) {
         return arxivSearchService.searchAndSavePapers(topic);
+    }
+    @Autowired
+    private LimitationExtractionService limitationExtractionService;
+
+    @PostMapping("/{id}/extract-limitations")
+    public List<Limitation> extractLimitations(@PathVariable Long id) {
+        Paper paper = paperRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paper not found with id: " + id));
+        return limitationExtractionService.extractLimitations(paper);
     }
 }
